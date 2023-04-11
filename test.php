@@ -7,7 +7,6 @@ function get_lottery_picks($inputStr)
     $minLottoValue = 1;
     $maxLottoValue = 59;
 
-    $singleDigitFound = 0;
     $doubleDigitFound = 0;
     $flag = true;
 
@@ -66,7 +65,6 @@ function get_lottery_picks($inputStr)
             if (!in_array($l[$i], $lottery))
             {
                 array_push($lottery, $l[$i]);
-                $singleDigitFound++;
             }
             else
             {
@@ -89,7 +87,6 @@ function get_lottery_picks($inputStr)
                 if (!in_array($l[$i], $lottery))
                 {
                     array_push($lottery, $l[$i]);
-                    $singleDigitFound += 1;
                 }
             }
         }
@@ -98,7 +95,6 @@ function get_lottery_picks($inputStr)
             if (!in_array($l[$i], $lottery))
             {
                 array_push($lottery, $l[$i]);
-                $singleDigitFound += 1;
             }
         }
     }
