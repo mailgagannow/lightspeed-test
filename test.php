@@ -1,34 +1,133 @@
 <?php
-function get_lottery_picks($strings) {
-    $lottery_picks = array();
-    foreach ($strings as $string) {
-        // Check that the string has exactly 7 digits
-        if (strlen($string) < 7 || strlen($string)> 14) {
-            continue;
-        }
-        
-        // Check that the digits are unique and between 1 and 59
-        $digits = str_split($string);
-        if (count(array_unique($digits)) != 7 || array_filter($digits, function($d) { return ($d < 1 || $d > 59); })) {
-            continue;
-        }
-        
-        // Check that the digits are in increasing order
-        $sorted_digits = $digits;
-        sort($sorted_digits);
-        if ($digits !== $sorted_digits) {
-            continue;
-        }
-        
-        // If all checks pass, add the lottery pick to the array
-        $lottery_pick = implode(" ", $digits);
-        $lottery_picks[$string] = $lottery_pick;
+function get_lottery_picks($inputStr)
+{
+    $totalUniqueDigit = 7;
+    $minLen = $totalUniqueDigit * 1;
+    $maxLen = $totalUniqueDigit * 2;
+    $minLottoValue = 1;
+    $maxLottoValue = 59;
+
+    $singleDigitFound = 0;
+    $doubleDigitFound = 0;
+    $flag = true;
+
+    $inputLen = strlen($inputStr);
+    $minDoubleDigit = $inputLen - $minLen;
+
+    if ($inputLen < $minLen || $inputLen > $maxLen)
+    {
+        return null;
     }
-    return $lottery_picks;
+
+    $l = array_map('intval', str_split($inputStr));
+
+    if ($inputLen == $minLen)
+    {
+        // check for 0 or duplicates
+        if (!in_array(0, $l) && count($l) == count(array_unique($l)))
+        {
+            return $l;
+        }
+        else
+        {
+            return null;
+        }
+    }
+
+    $lottery = array();
+    // skip iteration before a digit is previously used as double digit number
+    $skip = false;
+
+    for ($i = 0;$i < $inputLen;$i++)
+    {
+        if ($skip == true)
+        {
+            $skip = false;
+            continue;
+        }
+
+        // target is reached
+        if (count($lottery) == $totalUniqueDigit && $i == $inputLen)
+        {
+            break;
+        }
+
+        // illegal characters, cannot have zero
+        if ($l[$i] == 0)
+        {
+            $flag = false;
+            break;
+        }
+
+        // valid numbers from 1 to 59
+        if ($l[$i] >= 6)
+        {
+            // first digit is 6 or greater, cannot be double digit
+            if (!in_array($l[$i], $lottery))
+            {
+                array_push($lottery, $l[$i]);
+                $singleDigitFound++;
+            }
+            else
+            {
+                $flag = false;
+                break;
+            }
+        }
+        elseif ($i + 1 < $inputLen)
+        {
+            // double digit number
+            $n = $l[$i] * 10 + $l[$i + 1];
+            if ($n >= $minLottoValue && $n <= $maxLottoValue && !in_array($n, $lottery) && $doubleDigitFound < $minDoubleDigit)
+            {
+                array_push($lottery, $n);
+                $doubleDigitFound += 1;
+                $skip = true;
+            }
+            else
+            {   
+                if (!in_array($l[$i], $lottery))
+                {
+                    array_push($lottery, $l[$i]);
+                    $singleDigitFound += 1;
+                }
+            }
+        }
+        else
+        {
+            if (!in_array($l[$i], $lottery))
+            {
+                array_push($lottery, $l[$i]);
+                $singleDigitFound += 1;
+            }
+        }
+    }
+    if ($flag == true and count($lottery) == $totalUniqueDigit)
+    {
+        return $lottery;
+
+    }
+    else
+    {
+        return null;
+    }
+
+}
+$strings = array(
+    "569815571556",
+    "4938532894754",
+    "1234567",
+    "472844278465445"
+);
+foreach ($strings as $value)
+{
+    $result = get_lottery_picks($value);
+    if (!empty($result))
+    {
+        echo $value . '->' . implode(" ", $result) . "\n";
+
+    }
+
 }
 
-$strings = array("569815571556", "4938532894754", "1234567", "472844278465445");
-$lottery_picks = get_lottery_picks($strings);
-foreach ($lottery_picks as $key=>$value) {
-    echo $key.'->'.$value . "\n";
-}
+?>
