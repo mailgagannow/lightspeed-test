@@ -98,7 +98,7 @@ function get_lottery_picks($inputStr)
             }
         }
     }
-    if ($flag == true and count($lottery) == $totalUniqueDigit)
+    if ($flag == true && count($lottery) == $totalUniqueDigit)
     {
         return $lottery;
 
